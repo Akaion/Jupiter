@@ -1,0 +1,85 @@
+using System;
+using System.Runtime.InteropServices;
+
+namespace Jupiter.Etc
+{
+    internal static class Native
+    {
+        #region pinvoke
+        
+        // kernel32.dll imports
+        
+        [DllImport("kernel32.dll")]
+        internal static extern bool ReadProcessMemory(SafeHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesRead);
+
+        [DllImport("kernel32.dll")]
+        internal static extern IntPtr VirtualAllocEx(SafeHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation allocationType, MemoryProtection protection);
+
+        [DllImport("kernel32.dll")]
+        internal static extern bool VirtualFreeEx(SafeHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation freeType);
+
+        [DllImport("kernel32.dll")]
+        internal static extern bool VirtualProtectEx(SafeHandle processHandle, IntPtr baseAddress, int size, MemoryProtection newProtection, out MemoryProtection oldProtection);
+ 
+        [DllImport("kernel32.dll")]
+        internal static extern bool VirtualQueryEx(SafeHandle processHandle, IntPtr baseAddress, out MemoryBasicInformation buffer, int length);
+        
+        [DllImport("kernel32.dll")]
+        internal static extern bool WriteProcessMemory(SafeHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesWritten);
+        
+        #endregion
+        
+        #region Permissions
+        
+        [Flags]
+        internal enum MemoryAllocation
+        {
+            Commit = 0x01000,
+            Reserve = 0x02000,
+            Release = 0x08000
+        }
+
+        [Flags]
+        internal enum MemoryProtection
+        {
+            PageNoAccess = 0x01,
+            PageReadOnly = 0x02,
+            PageReadWrite = 0x04,
+            PageWriteCopy = 0x08,
+            PageExecute = 0x010,
+            PageExecuteRead = 0x020,
+            PageExecuteReadWrite = 0x040,
+            PageExecuteWriteCopy = 0x080,
+            PageGuard = 0x0100,
+            PageNoCache = 0x0200,
+            PageWriteCombine = 0x0400
+        }
+
+        [Flags]
+        internal enum MemoryRegionType
+        {
+            MemoryImage = 0x01000000
+        }
+        
+        #endregion
+        
+        #region Structures
+        
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct MemoryBasicInformation
+        {
+            internal readonly IntPtr BaseAddress;
+            
+            private readonly IntPtr AllocationBase;
+            private readonly int AllocationProtect;
+
+            internal readonly IntPtr RegionSize;
+
+            internal readonly int State;
+            internal readonly int Protect;
+            internal readonly int Type;
+        }
+        
+        #endregion
+    }
+}

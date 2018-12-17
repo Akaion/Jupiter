@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Authors>Akaion</Authors>
+        <Company>Akaion</Company>
+        <Description>A Windows memory editing library written in C# that supports several memory editing methods.
+</Description>
+        <RepositoryUrl>https://github.com/Akaion/Jupiter</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Version>1.0.1</Version>
+    </PropertyGroup>
+
+</Project>
