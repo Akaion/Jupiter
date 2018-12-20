@@ -5,7 +5,7 @@ using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
-    internal static class WriteMemory
+   internal static class WriteMemory
     {
         internal static bool Write(SafeHandle processHandle, IntPtr baseAddress, byte[] buffer)
         {
@@ -33,26 +33,19 @@ namespace Jupiter.Methods
             return true;
         }
 
-        internal static bool Write<TStructure>(SafeHandle processHandle, IntPtr baseAddress, TStructure structure)
-        {            
-            if (typeof(TStructure) == typeof(string))
-            {
-                // Get the byte representation of the string
+        internal static bool Write(SafeHandle processHandle, IntPtr baseAddress, string s)
+        {
+            // Get the byte representation of the string
                 
-                var bytes = Encoding.UTF8.GetBytes((string) (object) structure);
-                
-                // Write the string into the memory region at the address
-
-                return Write(processHandle, baseAddress, bytes);
-            }
+            var bytes = Encoding.UTF8.GetBytes(s);
             
-            // Ensure the structure isn't a reference type
-            
-            if (!typeof(TStructure).IsValueType)
-            {   
-                throw new ArgumentException("The structure provided was a reference type with no predefined size");
-            }
+            // Write the string into the memory region at the address
 
+            return Write(processHandle, baseAddress, bytes);
+        }
+        
+        internal static bool Write<TStructure>(SafeHandle processHandle, IntPtr baseAddress, TStructure structure) where TStructure : struct
+        {
             // Get the size of the structure
             
             var size = Marshal.SizeOf(typeof(TStructure));

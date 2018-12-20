@@ -1,16 +1,15 @@
 using System;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
 using System.Runtime.InteropServices;
+using static Jupiter.Etc.Native;
 
-namespace Jupiter.Wrapper
+namespace Jupiter.Wrappers
 {
-    internal class MemoryWrapper
+    internal class MethodWrapper
     {
         private readonly SafeHandle _processHandle;
         
-        internal MemoryWrapper(string processName)
+        internal MethodWrapper(string processName)
         {
             // Ensure the argument passed in is valid
 
@@ -40,7 +39,7 @@ namespace Jupiter.Wrapper
             _processHandle = process.SafeHandle;
         }
         
-        internal MemoryWrapper(int processId)
+        internal MethodWrapper(int processId)
         {
             // Ensure the argument passed in is valid
 
@@ -69,8 +68,8 @@ namespace Jupiter.Wrapper
 
             _processHandle = process.SafeHandle;
         }
-
-        internal MemoryWrapper(SafeHandle processHandle)
+        
+        internal MethodWrapper(SafeHandle processHandle)
         {
             // Ensure the argument passed in is valid
 
@@ -101,25 +100,16 @@ namespace Jupiter.Wrapper
             return Methods.FreeMemory.Free(_processHandle, baseAddress, size);
         }
 
-        internal IntPtr PatternScan(IntPtr baseAddress, string pattern)
+        internal bool ProtectMemory(IntPtr baseAddress, int size, int protection)
         {
-            var patternBytes = pattern.Split();
+            // Ensure the arguments passed in are valid
 
-            // Ensure the argument passed in is valid
-
-            if (baseAddress == IntPtr.Zero)
+            if (baseAddress == IntPtr.Zero || size == 0 || !Enum.IsDefined(typeof(MemoryProtection), protection))
             {
                 throw new ArgumentException("One or more of the arguments provided was invalid");
             }
-            
-            // Ensure the pattern is valid
 
-            if (patternBytes.Any(patternByte => patternByte != "??" && ! int.TryParse(patternByte, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _)))
-            {
-                throw new ArgumentException("The pattern provided contained one or more invalid characters");
-            }
-
-            return Extensions.PatternScanner.Scan(_processHandle, baseAddress, patternBytes);
+            return Methods.ProtectMemory.Protect(_processHandle, baseAddress, size, protection);
         }
         
         internal byte[] ReadMemory(IntPtr baseAddress, int size)
@@ -133,8 +123,8 @@ namespace Jupiter.Wrapper
             
             return Methods.ReadMemory.Read(_processHandle, baseAddress, size);
         }
-
-        internal TStructure ReadMemory<TStructure>(IntPtr baseAddress)
+        
+        internal TStructure ReadMemory<TStructure>(IntPtr baseAddress) where TStructure : struct
         {
             // Ensure the argument passed in is valid
 
@@ -158,7 +148,19 @@ namespace Jupiter.Wrapper
             return Methods.WriteMemory.Write(_processHandle, baseAddress, buffer);
         }
 
-        internal bool WriteMemory<TStructure>(IntPtr baseAddress, TStructure structure)
+        internal bool WriteMemory(IntPtr baseAddress, string s)
+        {
+            // Ensure the arguments passed in are valid
+
+            if (baseAddress == IntPtr.Zero || string.IsNullOrWhiteSpace(s))
+            {
+                throw new ArgumentException("One or more of the arguments provided was invalid");
+            }
+
+            return Methods.WriteMemory.Write(_processHandle, baseAddress, s);
+        }
+        
+        internal bool WriteMemory<TStructure>(IntPtr baseAddress, TStructure structure) where TStructure : struct
         {
             // Ensure the argument passed in is valid
 
