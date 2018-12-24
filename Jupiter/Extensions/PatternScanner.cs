@@ -53,18 +53,18 @@ namespace Jupiter.Extensions
             
             // Search the filtered memory regions for the pattern
             
-            var patternAddresses = new ConcurrentBag<IntPtr>();
+            var patternAddresses = new ConcurrentBag<List<IntPtr>>();
             
             Parallel.ForEach(filteredMemoryRegions, memoryRegion =>
             {
-                var address = FindPattern(processHandle, memoryRegion, pattern);
+                var addresses = FindPattern(processHandle, memoryRegion, pattern);
 
-                patternAddresses.Add(address);
+                patternAddresses.Add(addresses);
             });
 
             // Return an array of addresses where the pattern was found
-            
-            return patternAddresses.Where(address => address != IntPtr.Zero).ToArray();
+
+            return patternAddresses.SelectMany(address => address).Where(address => address != IntPtr.Zero).ToArray();
         }
 
         private static MemoryBasicInformation QueryMemory(SafeProcessHandle processHandle, IntPtr baseAddress)
@@ -74,31 +74,29 @@ namespace Jupiter.Extensions
             return VirtualQueryEx(processHandle, baseAddress, out var memoryInformation, memoryInformationSize) ? memoryInformation : default;
         }
         
-        private static IntPtr FindPattern(SafeProcessHandle processHandle, MemoryBasicInformation memoryRegion, IReadOnlyList<string> pattern)
+        private static List<IntPtr> FindPattern(SafeProcessHandle processHandle, MemoryBasicInformation memoryRegion, IReadOnlyList<string> pattern)
         {
+            var patternAddresses = new List<IntPtr>();
+            
             // Ensure the memory region size is valid
 
             if ((long) memoryRegion.RegionSize > int.MaxValue)
             {
-                return IntPtr.Zero;
+                return patternAddresses;
             }
             
             // Get the bytes of the memory region
             
             var memoryRegionBytes = ReadMemory.Read(processHandle, memoryRegion.BaseAddress, (int) memoryRegion.RegionSize);
 
-            if (memoryRegionBytes == null)
+            if (memoryRegionBytes is null)
             {
-                return IntPtr.Zero;
+                return patternAddresses;
             }
             
             // Calculate the indexes of any wildcard bytes
 
             var wildCardIndexArray = pattern.Select((wildcard, index) => wildcard == "??" ? index : -1).Where(index => index != -1).ToArray();
-            
-            // Search the memory region for the pattern 
-            
-            var patternAddress = IntPtr.Zero;
             
             // Initialize a lookup directory
             
@@ -141,7 +139,7 @@ namespace Jupiter.Extensions
 
                     if (patternFound)
                     {
-                        return memoryRegion.BaseAddress + (patternIndex - pattern.Count + 1);
+                        patternAddresses.Add(memoryRegion.BaseAddress + (patternIndex - pattern.Count + 1));
                     }
 
                     patternIndex += 1;
@@ -153,7 +151,7 @@ namespace Jupiter.Extensions
                 }
             }
 
-            return patternAddress;
+            return patternAddresses;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Jupiter.Wrappers
         {
             // Ensure the argument passed in is valid
 
-            if (processId == 0)
+            if (processId <= 0)
             {
                 throw new ArgumentException("One or more of the arguments provided was invalid");
             }
@@ -78,7 +78,7 @@ namespace Jupiter.Wrappers
         {
             // Ensure the argument passed in is valid
 
-            if (size == 0)
+            if (size <= 0)
             {
                 throw new ArgumentException("One or more of the arguments provided was invalid");
             }
@@ -102,7 +102,7 @@ namespace Jupiter.Wrappers
         {
             // Ensure the arguments passed in are valid
 
-            if (baseAddress == IntPtr.Zero || size == 0 || !Enum.IsDefined(typeof(MemoryProtection), protection))
+            if (baseAddress == IntPtr.Zero || size <= 0 || !Enum.IsDefined(typeof(MemoryProtection), protection))
             {
                 throw new ArgumentException("One or more of the arguments provided was invalid");
             }
@@ -114,7 +114,7 @@ namespace Jupiter.Wrappers
         {
             // Ensure the arguments passed in are valid
 
-            if (baseAddress == IntPtr.Zero || size == 0)
+            if (baseAddress == IntPtr.Zero || size <= 0)
             {
                 throw new ArgumentException("One or more of the arguments provided was invalid");
             }
@@ -138,7 +138,7 @@ namespace Jupiter.Wrappers
         {
             // Ensure the arguments passed in are valid
 
-            if (baseAddress == IntPtr.Zero || buffer == null)
+            if (baseAddress == IntPtr.Zero || buffer is null)
             {
                 throw new ArgumentException("One or more of the arguments provided was invalid");
             }
