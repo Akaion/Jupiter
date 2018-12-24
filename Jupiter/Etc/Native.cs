@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace Jupiter.Etc
 {
@@ -10,22 +11,22 @@ namespace Jupiter.Etc
         // kernel32.dll imports
         
         [DllImport("kernel32.dll")]
-        internal static extern bool ReadProcessMemory(SafeHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesRead);
+        internal static extern bool ReadProcessMemory(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesRead);
 
         [DllImport("kernel32.dll")]
-        internal static extern IntPtr VirtualAllocEx(SafeHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation allocationType, MemoryProtection protection);
+        internal static extern IntPtr VirtualAllocEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation allocationType, MemoryProtection protection);
 
         [DllImport("kernel32.dll")]
-        internal static extern bool VirtualFreeEx(SafeHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation freeType);
+        internal static extern bool VirtualFreeEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation freeType);
 
         [DllImport("kernel32.dll")]
-        internal static extern bool VirtualProtectEx(SafeHandle processHandle, IntPtr baseAddress, int size, MemoryProtection newProtection, out MemoryProtection oldProtection);
+        internal static extern bool VirtualProtectEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, MemoryProtection newProtection, out MemoryProtection oldProtection);
  
         [DllImport("kernel32.dll")]
-        internal static extern bool VirtualQueryEx(SafeHandle processHandle, IntPtr baseAddress, out MemoryBasicInformation buffer, int length);
+        internal static extern bool VirtualQueryEx(SafeProcessHandle processHandle, IntPtr baseAddress, out MemoryBasicInformation buffer, int length);
         
         [DllImport("kernel32.dll")]
-        internal static extern bool WriteProcessMemory(SafeHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesWritten);
+        internal static extern bool WriteProcessMemory(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesWritten);
         
         #endregion
         

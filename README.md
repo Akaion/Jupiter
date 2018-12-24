@@ -22,7 +22,7 @@ A Windows memory editing library written in C# that supports several memory edit
 
 ## Useage
 
-You can overload any method with the processes id or a safe handle to the process instead of the processes name
+You can overload any method with the processes id instead of the processes name
 
 #### Allocate Memory
 
@@ -45,7 +45,7 @@ var memoryModule = new MemoryModule();
 
 // Free memory in a remote process at an address
 
-memoryModule.FreeMemory("processName", address, size);
+memoryModule.FreeMemory("processName", address);
 ```
 
 #### Protect Memory
@@ -69,11 +69,11 @@ var memoryModule = new MemoryModule();
 
 // Read a byte array from a remote process at an address
 
-memoryModule.ReadMemory("processName", address, size);
+var memoryBytes = memoryModule.ReadMemory("processName", address, size);
 
 // Read a structure from a remote process at an address
 
-memoryModule.ReadMemory<bool>("processName", address);
+var memoryBoolean = memoryModule.ReadMemory<bool>("processName", address);
 
 // Read a string from a remote process at an address
 

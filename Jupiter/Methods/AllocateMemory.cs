@@ -1,12 +1,12 @@
 using System;
-using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
     internal static class AllocateMemory
     {
-        internal static IntPtr Allocate(SafeHandle processHandle, int size)
+        internal static IntPtr Allocate(SafeProcessHandle processHandle, int size)
         {
             // Allocate memory in the process
 

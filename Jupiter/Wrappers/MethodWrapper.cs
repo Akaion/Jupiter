@@ -1,13 +1,13 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 using static Jupiter.Etc.Native;
 
 namespace Jupiter.Wrappers
 {
-    internal class MethodWrapper
+    internal class MethodWrapper : IDisposable
     {
-        private readonly SafeHandle _processHandle;
+        private readonly SafeProcessHandle _processHandle;
         
         internal MethodWrapper(string processName)
         {
@@ -31,7 +31,7 @@ namespace Jupiter.Wrappers
             {
                 // The process isn't currently running
 
-                throw new Exception($"No process with name {processName} is currently running");
+                throw new ArgumentException($"No process with name {processName} is currently running");
             }
             
             // Get a handle to the process
@@ -57,11 +57,11 @@ namespace Jupiter.Wrappers
                 process = Process.GetProcessById(processId);
             }
 
-            catch (IndexOutOfRangeException)
+            catch (ArgumentException)
             {
                 // The process isn't currently running
 
-                throw new Exception($"No process with id {processId} is currently running");
+                throw new ArgumentException($"No process with id {processId} is currently running");
             }
             
             // Get a handle to the process
@@ -69,11 +69,9 @@ namespace Jupiter.Wrappers
             _processHandle = process.SafeHandle;
         }
         
-        internal MethodWrapper(SafeHandle processHandle)
+        public void Dispose()
         {
-            // Ensure the argument passed in is valid
-
-            _processHandle = processHandle ?? throw new ArgumentException("One or more of the arguments provided was invalid");
+            _processHandle?.Close();
         }
         
         internal IntPtr AllocateMemory(int size)
@@ -88,16 +86,16 @@ namespace Jupiter.Wrappers
             return Methods.AllocateMemory.Allocate(_processHandle, size);
         }
 
-        internal bool FreeMemory(IntPtr baseAddress, int size)
+        internal bool FreeMemory(IntPtr baseAddress)
         {
             // Ensure the arguments passed in are valid
 
-            if (baseAddress == IntPtr.Zero || size == 0)
+            if (baseAddress == IntPtr.Zero)
             {
                 throw new ArgumentException("One or more of the arguments provided was invalid");
             }
             
-            return Methods.FreeMemory.Free(_processHandle, baseAddress, size);
+            return Methods.FreeMemory.Free(_processHandle, baseAddress);
         }
 
         internal bool ProtectMemory(IntPtr baseAddress, int size, int protection)

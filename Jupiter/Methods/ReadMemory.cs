@@ -1,12 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
     internal static class ReadMemory
     {
-        internal static byte[] Read(SafeHandle processHandle, IntPtr baseAddress, int size)
+        internal static byte[] Read(SafeProcessHandle processHandle, IntPtr baseAddress, int size)
         {
             var buffer = new byte[size];
 
@@ -34,7 +35,7 @@ namespace Jupiter.Methods
             return buffer;
         }
 
-        internal static TStructure Read<TStructure>(SafeHandle processHandle, IntPtr baseAddress) where TStructure : struct
+        internal static TStructure Read<TStructure>(SafeProcessHandle processHandle, IntPtr baseAddress) where TStructure : struct
         {   
             // Get the size of the structure
             

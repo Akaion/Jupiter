@@ -6,13 +6,14 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Jupiter.Methods;
+using Microsoft.Win32.SafeHandles;
 using static Jupiter.Etc.Native;
 
 namespace Jupiter.Extensions
 {
     internal static class PatternScanner
     {
-        internal static IntPtr[] Scan(SafeHandle processHandle, IntPtr baseAddress, string[] pattern)
+        internal static IntPtr[] Scan(SafeProcessHandle processHandle, IntPtr baseAddress, string[] pattern)
         {
             // Initialize a list to store the memory regions of the process
 
@@ -66,14 +67,14 @@ namespace Jupiter.Extensions
             return patternAddresses.Where(address => address != IntPtr.Zero).ToArray();
         }
 
-        private static MemoryBasicInformation QueryMemory(SafeHandle processHandle, IntPtr baseAddress)
+        private static MemoryBasicInformation QueryMemory(SafeProcessHandle processHandle, IntPtr baseAddress)
         {
             var memoryInformationSize = Marshal.SizeOf(typeof(MemoryBasicInformation));
             
             return VirtualQueryEx(processHandle, baseAddress, out var memoryInformation, memoryInformationSize) ? memoryInformation : default;
         }
         
-        private static IntPtr FindPattern(SafeHandle processHandle, MemoryBasicInformation memoryRegion, IReadOnlyList<string> pattern)
+        private static IntPtr FindPattern(SafeProcessHandle processHandle, MemoryBasicInformation memoryRegion, IReadOnlyList<string> pattern)
         {
             // Ensure the memory region size is valid
 

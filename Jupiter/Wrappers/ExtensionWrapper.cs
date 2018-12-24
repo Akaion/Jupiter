@@ -2,13 +2,13 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace Jupiter.Wrappers
 {
-    internal class ExtensionWrapper
+    internal class ExtensionWrapper : IDisposable
     {
-        private readonly SafeHandle _processHandle;
+        private readonly SafeProcessHandle _processHandle;
         
         internal ExtensionWrapper(string processName)
         {
@@ -70,11 +70,9 @@ namespace Jupiter.Wrappers
             _processHandle = process.SafeHandle;
         }
         
-        internal ExtensionWrapper(SafeHandle processHandle)
+        public void Dispose()
         {
-            // Ensure the argument passed in is valid
-
-            _processHandle = processHandle ?? throw new ArgumentException("One or more of the arguments provided was invalid");
+            _processHandle?.Close();
         }
         
         internal IntPtr[] PatternScan(IntPtr baseAddress, string pattern)
@@ -94,7 +92,7 @@ namespace Jupiter.Wrappers
                                        .Reverse()
                                        .SkipWhile(patternByte => patternByte.Equals("??"))
                                        .Reverse().ToArray();
-
+            
             return Extensions.PatternScanner.Scan(_processHandle, baseAddress, patternBytes);
         } 
     }

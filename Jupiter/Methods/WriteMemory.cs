@@ -1,13 +1,14 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
 using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
    internal static class WriteMemory
     {
-        internal static bool Write(SafeHandle processHandle, IntPtr baseAddress, byte[] buffer)
+        internal static bool Write(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer)
         {
             // Change the protection of the memory region at the address
             
@@ -33,7 +34,7 @@ namespace Jupiter.Methods
             return true;
         }
 
-        internal static bool Write(SafeHandle processHandle, IntPtr baseAddress, string s)
+        internal static bool Write(SafeProcessHandle processHandle, IntPtr baseAddress, string s)
         {
             // Get the byte representation of the string
                 
@@ -44,7 +45,7 @@ namespace Jupiter.Methods
             return Write(processHandle, baseAddress, bytes);
         }
         
-        internal static bool Write<TStructure>(SafeHandle processHandle, IntPtr baseAddress, TStructure structure) where TStructure : struct
+        internal static bool Write<TStructure>(SafeProcessHandle processHandle, IntPtr baseAddress, TStructure structure) where TStructure : struct
         {
             // Get the size of the structure
             
