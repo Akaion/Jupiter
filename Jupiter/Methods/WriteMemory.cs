@@ -12,7 +12,7 @@ namespace Jupiter.Methods
         {
             // Change the protection of the memory region at the address
             
-            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, MemoryProtection.PageReadWrite, out var oldProtection))
+            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) MemoryProtection.PageReadWrite, out var oldProtection))
             {
                 return false;
             }

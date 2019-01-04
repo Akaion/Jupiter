@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <Authors>Akaion</Authors>
-        <PackageVersion>1.3.2</PackageVersion>
+        <PackageVersion>1.3.7</PackageVersion>
         <Description>A Windows memory editing library written in C# that supports several memory editing methods.</Description>
         <RepositoryUrl>https://github.com/Akaion/Jupiter</RepositoryUrl>
         <RepositoryType>git</RepositoryType>

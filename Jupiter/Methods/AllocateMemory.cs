@@ -12,7 +12,7 @@ namespace Jupiter.Methods
 
             const MemoryAllocation allocationType = MemoryAllocation.Commit | MemoryAllocation.Reserve;
 
-            return VirtualAllocEx(processHandle, IntPtr.Zero, size, allocationType, MemoryProtection.PageExecuteReadWrite);
+            return VirtualAllocEx(processHandle, IntPtr.Zero, size, (int) allocationType, (int) MemoryProtection.PageExecuteReadWrite);
         }
     }
 }

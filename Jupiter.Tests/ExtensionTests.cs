@@ -14,7 +14,7 @@ namespace Jupiter.Tests
         {   
             _memoryModule = new MemoryModule();
 
-            // Get the process id of the host process
+            // Get name of the host process
             
             _hostProcessName = Process.GetCurrentProcess().ProcessName;
         }
@@ -40,7 +40,7 @@ namespace Jupiter.Tests
 
             var result = _memoryModule.PatternScan(_hostProcessName, IntPtr.Zero, testArrayPattern);
             
-            Assert.True(testRegionAddress == result[0]);
+            Assert.Contains(testRegionAddress, result);
             
             // Free the memory that was allocated
 

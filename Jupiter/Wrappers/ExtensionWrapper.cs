@@ -77,7 +77,7 @@ namespace Jupiter.Wrappers
         
         internal IntPtr[] PatternScan(IntPtr baseAddress, string pattern)
         {
-            var patternBytes = pattern.Split();
+            var patternBytes = pattern.Split().ToList();
             
             // Ensure the pattern is valid
 
@@ -91,7 +91,7 @@ namespace Jupiter.Wrappers
             patternBytes = patternBytes.SkipWhile(patternByte => patternByte.Equals("??"))
                                        .Reverse()
                                        .SkipWhile(patternByte => patternByte.Equals("??"))
-                                       .Reverse().ToArray();
+                                       .Reverse().ToList();
             
             return Extensions.PatternScanner.Scan(_processHandle, baseAddress, patternBytes);
         } 

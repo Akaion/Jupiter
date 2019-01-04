@@ -10,7 +10,7 @@ namespace Jupiter.Methods
         {
             // Free memory in the process at the address
             
-            return VirtualFreeEx(processHandle, baseAddress, 0, MemoryAllocation.Release);
+            return VirtualFreeEx(processHandle, baseAddress, 0, (int) MemoryAllocation.Release);
         }
     }
 }

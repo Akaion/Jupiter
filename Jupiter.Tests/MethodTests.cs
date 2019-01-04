@@ -15,7 +15,7 @@ namespace Jupiter.Tests
         {   
             _memoryModule = new MemoryModule();
 
-            // Get the process id of the host process
+            // Get the name of the host process
             
             _hostProcessName = Process.GetCurrentProcess().ProcessName;
         }

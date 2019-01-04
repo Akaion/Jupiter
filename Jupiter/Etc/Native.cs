@@ -14,13 +14,13 @@ namespace Jupiter.Etc
         internal static extern bool ReadProcessMemory(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesRead);
 
         [DllImport("kernel32.dll")]
-        internal static extern IntPtr VirtualAllocEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation allocationType, MemoryProtection protection);
+        internal static extern IntPtr VirtualAllocEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int allocationType, int protection);
 
         [DllImport("kernel32.dll")]
-        internal static extern bool VirtualFreeEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, MemoryAllocation freeType);
+        internal static extern bool VirtualFreeEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int freeType);
 
         [DllImport("kernel32.dll")]
-        internal static extern bool VirtualProtectEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, MemoryProtection newProtection, out MemoryProtection oldProtection);
+        internal static extern bool VirtualProtectEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int newProtection, out int oldProtection);
  
         [DllImport("kernel32.dll")]
         internal static extern bool VirtualQueryEx(SafeProcessHandle processHandle, IntPtr baseAddress, out MemoryBasicInformation buffer, int length);

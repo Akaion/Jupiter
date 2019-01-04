@@ -8,7 +8,9 @@ namespace Jupiter.Methods
     {
         internal static bool Protect(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int protection)
         {
-            return VirtualProtectEx(processHandle, baseAddress, size, (MemoryProtection) protection, out _);
+            // Protect memory in the process at the address
+            
+            return VirtualProtectEx(processHandle, baseAddress, size, protection, out _);
         }
     }
 }

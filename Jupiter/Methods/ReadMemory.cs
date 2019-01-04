@@ -13,7 +13,7 @@ namespace Jupiter.Methods
 
             // Change the protection of the memory region at the address
             
-            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, MemoryProtection.PageReadOnly, out var oldProtection))
+            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) MemoryProtection.PageReadWrite, out var oldProtection))
             {
                 return null;
             }
@@ -44,6 +44,11 @@ namespace Jupiter.Methods
             // Read the memory from the memory region
 
             var buffer = Read(processHandle, baseAddress, size);
+
+            if (buffer is null)
+            {
+                return default;
+            }
             
             // Allocate temporary memory to store the buffer
 
