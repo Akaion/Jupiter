@@ -1,7 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
+using Jupiter.Etc;
+using Jupiter.Services;
 using Microsoft.Win32.SafeHandles;
-using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
@@ -13,23 +14,23 @@ namespace Jupiter.Methods
 
             // Change the protection of the memory region at the address
             
-            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) MemoryProtection.PageReadWrite, out var oldProtection))
+            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) Native.MemoryProtection.PageReadWrite, out var oldProtection))
             {
-                return null;
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
             }
             
             // Read the memory from the memory region into the buffer
 
-            if (!ReadProcessMemory(processHandle, baseAddress, buffer, buffer.Length, 0))
+            if (!Native.ReadProcessMemory(processHandle, baseAddress, buffer, buffer.Length, 0))
             {
-                return null;
+                ExceptionHandler.ThrowWin32Exception("Failed to read memory from the process");
             }
             
             // Restore the protection of the memory region at the address
             
-            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, oldProtection, out _))
+            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, oldProtection, out _))
             {
-                return null;
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
             }
             
             return buffer;
@@ -44,11 +45,6 @@ namespace Jupiter.Methods
             // Read the memory from the memory region
 
             var buffer = Read(processHandle, baseAddress, size);
-
-            if (buffer is null)
-            {
-                return default;
-            }
             
             // Allocate temporary memory to store the buffer
 

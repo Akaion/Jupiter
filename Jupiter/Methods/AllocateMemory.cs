@@ -1,6 +1,7 @@
 using System;
+using Jupiter.Etc;
+using Jupiter.Services;
 using Microsoft.Win32.SafeHandles;
-using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
@@ -10,9 +11,16 @@ namespace Jupiter.Methods
         {
             // Allocate memory in the process
 
-            const MemoryAllocation allocationType = MemoryAllocation.Commit | MemoryAllocation.Reserve;
+            const Native.MemoryAllocation allocationType = Native.MemoryAllocation.Commit | Native.MemoryAllocation.Reserve;
 
-            return VirtualAllocEx(processHandle, IntPtr.Zero, size, (int) allocationType, (int) MemoryProtection.PageExecuteReadWrite);
+            var result = Native.VirtualAllocEx(processHandle, IntPtr.Zero, size, (int) allocationType, (int) Native.MemoryProtection.PageExecuteReadWrite);
+
+            if (result == IntPtr.Zero)
+            {
+                ExceptionHandler.ThrowWin32Exception("Failed to allocate memory in the process");
+            }
+
+            return result;
         }
     }
 }

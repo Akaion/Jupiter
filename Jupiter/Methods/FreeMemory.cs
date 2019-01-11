@@ -1,6 +1,7 @@
 using System;
+using Jupiter.Etc;
+using Jupiter.Services;
 using Microsoft.Win32.SafeHandles;
-using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
@@ -9,8 +10,15 @@ namespace Jupiter.Methods
         internal static bool Free(SafeProcessHandle processHandle, IntPtr baseAddress)
         {
             // Free memory in the process at the address
+
+            var result = Native.VirtualFreeEx(processHandle, baseAddress, 0, (int) Native.MemoryAllocation.Release);
             
-            return VirtualFreeEx(processHandle, baseAddress, 0, (int) MemoryAllocation.Release);
+            if (!result)
+            {
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
+            }
+
+            return result;
         }
     }
 }

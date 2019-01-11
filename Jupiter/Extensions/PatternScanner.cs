@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Jupiter.Etc;
 using Jupiter.Methods;
 using Microsoft.Win32.SafeHandles;
-using static Jupiter.Etc.Native;
 
 namespace Jupiter.Extensions
 {
@@ -17,7 +18,7 @@ namespace Jupiter.Extensions
         {
             // Initialize a list to store the memory regions of the process
 
-            var memoryRegions = new ConcurrentBag<MemoryBasicInformation>
+            var memoryRegions = new ConcurrentBag<Native.MemoryBasicInformation>
             {
                 // Get the first memory region
                 
@@ -46,10 +47,10 @@ namespace Jupiter.Extensions
             
             // Filter the memory regions to avoid searching unnecessary regions
             
-            var filteredMemoryRegions = memoryRegions.Where(memoryRegion => memoryRegion.State == (int) MemoryAllocation.Commit
-                                                                         && memoryRegion.Protect != (int) MemoryProtection.PageNoAccess
-                                                                         && memoryRegion.Protect != (int) MemoryProtection.PageGuard
-                                                                         && memoryRegion.Type != (int) MemoryRegionType.MemoryImage).ToList();
+            var filteredMemoryRegions = memoryRegions.Where(memoryRegion => memoryRegion.State == (int) Native.MemoryAllocation.Commit
+                                                                         && memoryRegion.Protect != (int) Native.MemoryProtection.PageNoAccess
+                                                                         && memoryRegion.Protect != (int) Native.MemoryProtection.PageGuard
+                                                                         && memoryRegion.Type != (int) Native.MemoryRegionType.MemoryImage).ToList();
             
             // Search the filtered memory regions for the pattern
             
@@ -67,14 +68,14 @@ namespace Jupiter.Extensions
             return patternAddresses.SelectMany(address => address).Where(address => address != IntPtr.Zero).ToArray();
         }
 
-        private static MemoryBasicInformation QueryMemory(SafeProcessHandle processHandle, IntPtr baseAddress)
+        private static Native.MemoryBasicInformation QueryMemory(SafeProcessHandle processHandle, IntPtr baseAddress)
         {
-            var memoryInformationSize = Marshal.SizeOf(typeof(MemoryBasicInformation));
+            var memoryInformationSize = Marshal.SizeOf(typeof(Native.MemoryBasicInformation));
             
-            return VirtualQueryEx(processHandle, baseAddress, out var memoryInformation, memoryInformationSize) ? memoryInformation : default;
+            return Native.VirtualQueryEx(processHandle, baseAddress, out var memoryInformation, memoryInformationSize) ? memoryInformation : default;
         }
         
-        private static List<IntPtr> FindPattern(SafeProcessHandle processHandle, MemoryBasicInformation memoryRegion, IReadOnlyList<string> pattern)
+        private static List<IntPtr> FindPattern(SafeProcessHandle processHandle, Native.MemoryBasicInformation memoryRegion, IReadOnlyList<string> pattern)
         {
             var patternAddresses = new List<IntPtr>();
             
@@ -86,17 +87,22 @@ namespace Jupiter.Extensions
             }
             
             // Get the bytes of the memory region
-            
-            var memoryRegionBytes = ReadMemory.Read(processHandle, memoryRegion.BaseAddress, (int) memoryRegion.RegionSize);
 
-            if (memoryRegionBytes is null)
+            byte[] memoryRegionBytes;
+
+            try
+            {
+                memoryRegionBytes = ReadMemory.Read(processHandle, memoryRegion.BaseAddress, (int) memoryRegion.RegionSize);
+            }
+
+            catch (Win32Exception)
             {
                 return patternAddresses;
             }
             
             // Calculate the indexes of any wildcard bytes
 
-            var wildCardIndexArray = pattern.Select((wildcard, index) => wildcard == "??" ? index : -1).Where(index => index != -1).ToList();
+            var wildCardIndexList = pattern.Select((wildcard, index) => wildcard == "??" ? index : -1).Where(index => index != -1).ToList();
             
             // Initialize a lookup directory
             
@@ -111,7 +117,7 @@ namespace Jupiter.Extensions
             
             foreach (var index in Enumerable.Range(0, pattern.Count))
             {
-                if (wildCardIndexArray.Contains(index))
+                if (wildCardIndexList.Contains(index))
                 {
                     break;
                 }

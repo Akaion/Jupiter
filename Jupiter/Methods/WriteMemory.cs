@@ -1,8 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using Jupiter.Etc;
+using Jupiter.Services;
 using Microsoft.Win32.SafeHandles;
-using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
@@ -12,23 +13,23 @@ namespace Jupiter.Methods
         {
             // Change the protection of the memory region at the address
             
-            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) MemoryProtection.PageReadWrite, out var oldProtection))
+            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) Native.MemoryProtection.PageReadWrite, out var oldProtection))
             {
-                return false;
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
             }
             
             // Write the buffer into the memory region
             
-            if (!WriteProcessMemory(processHandle, baseAddress, buffer, buffer.Length, 0))
+            if (!Native.WriteProcessMemory(processHandle, baseAddress, buffer, buffer.Length, 0))
             {
-                return false;
+                ExceptionHandler.ThrowWin32Exception("Failed to write memory in the process");
             }
             
             // Restore the protection of the memory region at the address
             
-            if (!VirtualProtectEx(processHandle, baseAddress, buffer.Length, oldProtection, out _))
+            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, oldProtection, out _))
             {
-                return false;
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
             }
             
             return true;
@@ -38,11 +39,11 @@ namespace Jupiter.Methods
         {
             // Get the byte representation of the string
                 
-            var bytes = Encoding.UTF8.GetBytes(s);
+            var stringBytes = Encoding.UTF8.GetBytes(s);
             
             // Write the string into the memory region at the address
 
-            return Write(processHandle, baseAddress, bytes);
+            return Write(processHandle, baseAddress, stringBytes);
         }
         
         internal static bool Write<TStructure>(SafeProcessHandle processHandle, IntPtr baseAddress, TStructure structure) where TStructure : struct

@@ -1,6 +1,7 @@
 using System;
+using Jupiter.Etc;
+using Jupiter.Services;
 using Microsoft.Win32.SafeHandles;
-using static Jupiter.Etc.Native;
 
 namespace Jupiter.Methods
 {
@@ -10,7 +11,14 @@ namespace Jupiter.Methods
         {
             // Protect memory in the process at the address
             
-            return VirtualProtectEx(processHandle, baseAddress, size, protection, out _);
+            var result = Native.VirtualProtectEx(processHandle, baseAddress, size, protection, out _);
+
+            if (!result)
+            {
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
+            }
+
+            return result;
         }
     }
 }
