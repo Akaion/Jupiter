@@ -11,22 +11,22 @@ namespace Jupiter.Etc
         // kernel32.dll imports
         
         [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern bool ReadProcessMemory(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesRead);
-
+        internal static extern bool ReadProcessMemory(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, IntPtr bytesReadBuffer);
+        
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern IntPtr VirtualAllocEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int allocationType, int protection);
-
+        
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool VirtualFreeEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int freeType);
-
+        
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool VirtualProtectEx(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int newProtection, out int oldProtection);
- 
+        
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool VirtualQueryEx(SafeProcessHandle processHandle, IntPtr baseAddress, out MemoryBasicInformation buffer, int length);
         
         [DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern bool WriteProcessMemory(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, int bytesWritten);
+        internal static extern bool WriteProcessMemory(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer, int size, IntPtr bytesWrittenBuffer);
         
         #endregion
         
@@ -39,21 +39,21 @@ namespace Jupiter.Etc
             Reserve = 0x02000,
             Release = 0x08000
         }
-
+        
         [Flags]
         internal enum MemoryProtection
         {
-            PageNoAccess = 0x01,
-            PageReadOnly = 0x02,
-            PageReadWrite = 0x04,
-            PageWriteCopy = 0x08,
-            PageExecute = 0x010,
-            PageExecuteRead = 0x020,
-            PageExecuteReadWrite = 0x040,
-            PageExecuteWriteCopy = 0x080,
-            PageGuard = 0x0100,
-            PageNoCache = 0x0200,
-            PageWriteCombine = 0x0400
+            NoAccess = 0x01,
+            ReadOnly = 0x02,
+            ReadWrite = 0x04,
+            WriteCopy = 0x08,
+            Execute = 0x010,
+            ExecuteRead = 0x020,
+            ExecuteReadWrite = 0x040,
+            ExecuteWriteCopy = 0x080,
+            Guard = 0x0100,
+            NoCache = 0x0200,
+            WriteCombine = 0x0400
         }
 
         [Flags]
@@ -70,15 +70,15 @@ namespace Jupiter.Etc
         internal struct MemoryBasicInformation
         {
             internal readonly IntPtr BaseAddress;
-            
+                
             private readonly IntPtr AllocationBase;
-            private readonly int AllocationProtect;
-
+            private readonly uint AllocationProtect;
+            
             internal readonly IntPtr RegionSize;
-
-            internal readonly int State;
-            internal readonly int Protect;
-            internal readonly int Type;
+            
+            internal readonly uint State;
+            internal readonly uint Protect;
+            internal readonly uint Type;
         }
         
         #endregion

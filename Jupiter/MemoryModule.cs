@@ -63,6 +63,22 @@ namespace Jupiter
             }
         }
         
+        public IntPtr[] PatternScan(string processName, IntPtr baseAddress, byte[] patternBytes)
+        {
+            using (var extensionWrapper = new ExtensionWrapper(processName))
+            {
+                return extensionWrapper.PatternScan(baseAddress, patternBytes);
+            }
+        }
+        
+        public IntPtr[] PatternScan(int processId, IntPtr baseAddress, byte[] patternBytes)
+        {
+            using (var extensionWrapper = new ExtensionWrapper(processId))
+            {
+                return extensionWrapper.PatternScan(baseAddress, patternBytes);
+            }
+        }
+        
         #endregion
 
         #region ProtectMemory

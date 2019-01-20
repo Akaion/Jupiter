@@ -9,15 +9,15 @@ namespace Jupiter.Methods
     {
         internal static bool Protect(SafeProcessHandle processHandle, IntPtr baseAddress, int size, int protection)
         {
-            // Protect memory in the process at the address
+            // Protect memory in the remote process at the address
             
             var result = Native.VirtualProtectEx(processHandle, baseAddress, size, protection, out _);
-
+            
             if (!result)
             {
-                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the remote process");
             }
-
+            
             return result;
         }
     }

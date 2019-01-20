@@ -12,15 +12,15 @@ namespace Jupiter.Methods
         internal static bool Write(SafeProcessHandle processHandle, IntPtr baseAddress, byte[] buffer)
         {
             // Change the protection of the memory region at the address
-            
-            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) Native.MemoryProtection.PageReadWrite, out var oldProtection))
+               
+            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) Native.MemoryProtection.ReadWrite, out var oldProtection))
             {
                 ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
             }
             
             // Write the buffer into the memory region
             
-            if (!Native.WriteProcessMemory(processHandle, baseAddress, buffer, buffer.Length, 0))
+            if (!Native.WriteProcessMemory(processHandle, baseAddress, buffer, buffer.Length, IntPtr.Zero))
             {
                 ExceptionHandler.ThrowWin32Exception("Failed to write memory in the process");
             }
@@ -34,15 +34,15 @@ namespace Jupiter.Methods
             
             return true;
         }
-
+        
         internal static bool Write(SafeProcessHandle processHandle, IntPtr baseAddress, string s)
         {
             // Get the byte representation of the string
                 
-            var stringBytes = Encoding.UTF8.GetBytes(s);
+            var stringBytes = Encoding.Unicode.GetBytes(s);
             
             // Write the string into the memory region at the address
-
+            
             return Write(processHandle, baseAddress, stringBytes);
         }
         
@@ -53,7 +53,7 @@ namespace Jupiter.Methods
             var size = Marshal.SizeOf(typeof(TStructure));
             
             // Initialize a buffer to store the bytes of the structure
-
+            
             var buffer = new byte[size];
             
             // Allocate temporary memory to store the structure
@@ -73,7 +73,7 @@ namespace Jupiter.Methods
             Marshal.FreeHGlobal(structureAddress);
             
             // Write the structure into the memory region at the address
-
+            
             return Write(processHandle, baseAddress, buffer);
         }
     }

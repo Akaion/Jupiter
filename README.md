@@ -2,7 +2,7 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/jp6fnwbq34w012gj?svg=true)](https://ci.appveyor.com/project/Akaion/jupiter)
 
-A Windows memory editing library written in C# that supports several memory editing methods.
+A Windows external memory editing library written in C# that supports several memory editing methods.
 
 ----
 
@@ -16,7 +16,7 @@ A Windows memory editing library written in C# that supports several memory edit
 
 ### Extensions
 
-* Pattern Scanning with support for wildcard bytes (using the Bower-Moore algorithm for comparisons)
+* Pattern Scanning with support for wildcard bytes
 
 ----
 
@@ -28,7 +28,7 @@ A Windows memory editing library written in C# that supports several memory edit
 
 ### Useage
 
-All methods can be overloaded with the processes id instead of the processes name
+Any method can be overloaded with a process id instead of a process name
 
 #### Allocate Memory
 
@@ -112,6 +112,19 @@ var memoryModule = new MemoryModule();
 var patternAddresses = memoryModule.PatternScan("processName", IntPtr.Zero, "45 FF ?? 01 ?? ?? 2A");
 ```
 
+You also have the option to overload the pattern with a byte array representing the pattern if wildcard bytes are not needed
+
+```csharp
+using Jupiter;
+
+var memoryModule = new MemoryModule();
+
+// Find the addresses where a pattern appears in a remote process
+
+var pattern = new byte[] {0x45, 0xFF, 0x00, 0x01, 0x24, 0xAA, 0x2A};
+
+var patternAddresses = memoryModule.PatternScan("processName", IntPtr.Zero, pattern);
+```
 ----
 
 ### Contributing
@@ -119,5 +132,3 @@ var patternAddresses = memoryModule.PatternScan("processName", IntPtr.Zero, "45 
 Pull requests are welcome. 
 
 For large changes, please open an issue first to discuss what you would like to add.
-
-----

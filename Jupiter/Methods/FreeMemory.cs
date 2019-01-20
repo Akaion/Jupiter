@@ -9,15 +9,15 @@ namespace Jupiter.Methods
     {
         internal static bool Free(SafeProcessHandle processHandle, IntPtr baseAddress)
         {
-            // Free memory in the process at the address
-
+            // Free memory in the remote process at the address
+            
             var result = Native.VirtualFreeEx(processHandle, baseAddress, 0, (int) Native.MemoryAllocation.Release);
             
             if (!result)
             {
-                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
+                ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the remote process");
             }
-
+            
             return result;
         }
     }

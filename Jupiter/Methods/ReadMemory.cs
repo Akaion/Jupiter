@@ -11,17 +11,17 @@ namespace Jupiter.Methods
         internal static byte[] Read(SafeProcessHandle processHandle, IntPtr baseAddress, int size)
         {
             var buffer = new byte[size];
-
+            
             // Change the protection of the memory region at the address
             
-            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) Native.MemoryProtection.PageReadWrite, out var oldProtection))
+            if (!Native.VirtualProtectEx(processHandle, baseAddress, buffer.Length, (int) Native.MemoryProtection.ReadWrite, out var oldProtection))
             {
                 ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
             }
             
             // Read the memory from the memory region into the buffer
-
-            if (!Native.ReadProcessMemory(processHandle, baseAddress, buffer, buffer.Length, 0))
+            
+            if (!Native.ReadProcessMemory(processHandle, baseAddress, buffer, buffer.Length, IntPtr.Zero))
             {
                 ExceptionHandler.ThrowWin32Exception("Failed to read memory from the process");
             }
@@ -32,10 +32,10 @@ namespace Jupiter.Methods
             {
                 ExceptionHandler.ThrowWin32Exception("Failed to protect memory in the process");
             }
-            
+                
             return buffer;
         }
-
+        
         internal static TStructure Read<TStructure>(SafeProcessHandle processHandle, IntPtr baseAddress) where TStructure : struct
         {   
             // Get the size of the structure
@@ -43,11 +43,11 @@ namespace Jupiter.Methods
             var size = Marshal.SizeOf(typeof(TStructure));
             
             // Read the memory from the memory region
-
+            
             var buffer = Read(processHandle, baseAddress, size);
             
             // Allocate temporary memory to store the buffer
-
+            
             var bufferAddress = Marshal.AllocHGlobal(buffer.Length);
             
             // Copy the buffer into the temporary memory region
