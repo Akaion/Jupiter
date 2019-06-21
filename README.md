@@ -34,58 +34,67 @@ The example below describes a basic implementation of the library
 ```csharp
 using Jupiter;
 
-var memoryModule = new MemoryModule(processName);
+using (var memoryModule = new MemoryModule(processName))
+{
+    var memoryModule = new MemoryModule(processName);
 
-// Allocate a region of virtual memory in the process
+    // Allocate a region of virtual memory in the process
 
-var regionAddress = memoryModule.AllocateVirtualMemory(sizeof(int), MemoryProtection.ReadWrite);
+    var regionAddress = memoryModule.AllocateVirtualMemory(sizeof(int), MemoryProtection.ReadWrite);
 
-// Write a value into the newely allocated region
+    // Write a value into the newely allocated region
 
-memoryModule.WriteVirtualMemory(regionAddress, 25);
+    memoryModule.WriteVirtualMemory(regionAddress, 25);
 
-// Scan for the value we just wrote into memory
+    // Scan for the value we just wrote into memory
 
-var patternAddresses = memoryModule.PatternScan(BitConverter.GetBytes(25));
+    var patternAddresses = memoryModule.PatternScan(BitConverter.GetBytes(25));
 
-// Read the value back
+    // Read the value back
 
-var value = memoryModule.ReadVirtualMemory<int>(regionAddress);
+    var value = memoryModule.ReadVirtualMemory<int>(regionAddress);
 
-// Free the region of virtual memory
+    // Free the region of virtual memory
 
-memoryModule.FreeVirtualMemory(regionAddress);
+    memoryModule.FreeVirtualMemory(regionAddress);
+}
+
 ```
 
 ----
 
 ### Overloads
 
-The first of these allows you to specify an address in which you want to allocate a region of virtual memory.
+The first of these allows you to use a process ID instead of a process name.
+
+```csharp
+var memoryModule = new MemoryModule(processId)
+```
+The second of these allows you to specify an address in which you want to allocate a region of virtual memory.
 
 ```csharp
 var regionAddress = memoryModule.AllocateVirtualMemory(pointer, sizeof(int), MemoryProtection.ReadWrite);
 ```
 
-The second of these allows you to read an array of bytes instead of a structure.
+The third of these allows you to read an array of bytes instead of a structure.
 
 ```csharp
 var bytes = memoryModule.ReadVirtualMemory(regionAddress, bytesToRead);
 ```
 
-The third of these allows you to write an array of bytes instead of a structure.
+The fourth of these allows you to write an array of bytes instead of a structure.
 
 ```csharp
 memoryModule.WriteVirtualMemory(regionAddress, new byte[] {0x19, 0xF0, 0x00, 0x2A});
 ```
 
-The fourth of these allows you to use a string with wildcards as the pattern for pattern scanning.
+The fifth of these allows you to use a string with wildcards as the pattern for pattern scanning.
 
 ```csharp
 memoryModule.PatternScan("19 F0 ?? 2A");
 ```
 
-The fifth of these allows you to specify a base address in which the pattern scanning should start at to allow quicker scans.
+The sixth of these allows you to specify a base address in which the pattern scanning should start at to allow quicker scans.
 
 ```csharp
 memoryModule.PatternScan(pointer, BitConverter.GetBytes(25));
