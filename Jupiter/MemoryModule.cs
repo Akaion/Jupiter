@@ -1,192 +1,181 @@
 using System;
-using Jupiter.Wrappers;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Jupiter.Memory;
+using Jupiter.Shared.Handlers;
 
 namespace Jupiter
-{   
-    public class MemoryModule
-    {      
-        #region AllocateMemory
+{
+    /// <summary>
+    /// Initialises an instance capable of managing memory in a specified remote process
+    /// </summary>
+    public class MemoryModule : IDisposable
+    {
+        private readonly MemoryManager _memoryManager;
+
+        private readonly PatternScanner _patternScanner;
         
-        public IntPtr AllocateMemory(string processName, int size)
+        /// <summary>
+        /// Initialises an instance capable of managing memory in a specified remote process
+        /// </summary>
+        public MemoryModule(int processId)
         {
-            using (var methodWrapper = new MethodWrapper(processName))
-            {
-                return methodWrapper.AllocateMemory(size);
-            }
+            ValidationHandler.ValidateOperatingSystem();
+            
+            _memoryManager = new MemoryManager(processId);
+            
+            _patternScanner = new PatternScanner(_memoryManager);
         }
         
-        public IntPtr AllocateMemory(int processId, int size)
+        /// <summary>
+        /// Initialises an instance capable of managing memory in a specified remote process
+        /// </summary>
+        public MemoryModule(string processName)
         {
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.AllocateMemory(size);
-            }
+            ValidationHandler.ValidateOperatingSystem();
+            
+            _memoryManager = new MemoryManager(processName);
+            
+            _patternScanner = new PatternScanner(_memoryManager);
+        }
+        
+        /// <summary>
+        /// Frees the unmanaged resources used by the instance
+        /// </summary>
+        public void Dispose()
+        {
+            _memoryManager.Dispose();
         }
 
-        #endregion
-        
-        #region FreeMemory
-        
-        public bool FreeMemory(string processName, IntPtr baseAddress)
+        /// <summary>
+        /// Allocates a region of virtual memory in the remote process
+        /// </summary>
+        public IntPtr AllocateVirtualMemory(IntPtr baseAddress, int allocationSize, MemoryProtection protectionType = MemoryProtection.ExecuteReadWrite)
         {
-            using (var methodWrapper = new MethodWrapper(processName))
-            {
-                return methodWrapper.FreeMemory(baseAddress);
-            }
+            return _memoryManager.AllocateVirtualMemory(baseAddress, allocationSize, protectionType);
         }
         
-        public bool FreeMemory(int processId, IntPtr baseAddress)
+        /// <summary>
+        /// Allocates a region of virtual memory in the remote process
+        /// </summary>
+        public IntPtr AllocateVirtualMemory(int allocationSize, MemoryProtection protectionType = MemoryProtection.ExecuteReadWrite)
         {
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.FreeMemory(baseAddress);
-            }
-        }
-        
-        #endregion
-        
-        #region PatternScan
-        
-        public IntPtr[] PatternScan(string processName, IntPtr baseAddress, string pattern)
-        {
-            using (var extensionWrapper = new ExtensionWrapper(processName))
-            {
-                return extensionWrapper.PatternScan(baseAddress, pattern);
-            }
-        }
-        
-        public IntPtr[] PatternScan(int processId, IntPtr baseAddress, string pattern)
-        {
-            using (var extensionWrapper = new ExtensionWrapper(processId))
-            {
-                return extensionWrapper.PatternScan(baseAddress, pattern);
-            }
-        }
-        
-        public IntPtr[] PatternScan(string processName, IntPtr baseAddress, byte[] patternBytes)
-        {
-            using (var extensionWrapper = new ExtensionWrapper(processName))
-            {
-                return extensionWrapper.PatternScan(baseAddress, patternBytes);
-            }
-        }
-        
-        public IntPtr[] PatternScan(int processId, IntPtr baseAddress, byte[] patternBytes)
-        {
-            using (var extensionWrapper = new ExtensionWrapper(processId))
-            {
-                return extensionWrapper.PatternScan(baseAddress, patternBytes);
-            }
-        }
-        
-        #endregion
-
-        #region ProtectMemory
-        
-        public bool ProtectMemory(string processName, IntPtr baseAddress, int size, int protection)
-        {
-            using (var methodWrapper = new MethodWrapper(processName))
-            {
-                return methodWrapper.ProtectMemory(baseAddress, size, protection);
-            }
-        }
-        
-        public bool ProtectMemory(int processId, IntPtr baseAddress, int size, int protection)
-        {
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.ProtectMemory(baseAddress, size, protection);
-            }
-        }
-        
-        #endregion
-        
-        #region ReadMemory
-        
-        public byte[] ReadMemory(string processName, IntPtr baseAddress, int size)
-        {
-            using (var methodWrapper = new MethodWrapper(processName))
-            {
-                return methodWrapper.ReadMemory(baseAddress, size);
-            }
-        }
-        
-        public byte[] ReadMemory(int processId, IntPtr baseAddress, int size)
-        {
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.ReadMemory(baseAddress, size);
-            }
+            return _memoryManager.AllocateVirtualMemory(IntPtr.Zero, allocationSize, protectionType);
         }
 
-        public TStructure ReadMemory<TStructure>(string processName, IntPtr baseAddress) where TStructure : struct
+        /// <summary>
+        /// Frees a region of virtual memory in the remote process
+        /// </summary>
+        public void FreeVirtualMemory(IntPtr baseAddress)
         {
-            using (var methodWrapper = new MethodWrapper(processName))
-            {
-                return methodWrapper.ReadMemory<TStructure>(baseAddress);
-            }  
+            _memoryManager.FreeVirtualMemory(baseAddress);
         }
-        
-        public TStructure ReadMemory<TStructure>(int processId, IntPtr baseAddress) where TStructure : struct
-        {    
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.ReadMemory<TStructure>(baseAddress);
-            }  
-        }
-        
-        #endregion
 
-        #region WriteMemory
-        
-        public bool WriteMemory(string processName, IntPtr baseAddress, byte[] buffer)
+        /// <summary>
+        /// Searches the memory of the remote process for the specified pattern
+        /// </summary>
+        public IEnumerable<IntPtr> PatternScan(IntPtr baseAddress, byte[] pattern)
         {
-            using (var methodWrapper = new MethodWrapper(processName))
+            // Ensure the arguments passed in are valid
+
+            if (pattern is null || pattern.Length == 0)
             {
-                return methodWrapper.WriteMemory(baseAddress, buffer);
+                throw new ArgumentException("One or more of the arguments provided were invalid");
             }
+            
+            // Convert the pattern into a hexadecimal string
+            
+            var hexPattern = BitConverter.ToString(pattern).Replace("-", " ").Split().ToList();
+
+            return _patternScanner.FindPattern(baseAddress, hexPattern);
         }
         
-        public bool WriteMemory(int processId, IntPtr baseAddress, byte[] buffer)
+        /// <summary>
+        /// Searches the memory of the remote process for the specified pattern
+        /// </summary>
+        public IEnumerable<IntPtr> PatternScan(byte[] pattern)
         {
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.WriteMemory(baseAddress, buffer);
-            }
+            return PatternScan(IntPtr.Zero, pattern);
         }
         
-        public bool WriteMemory(string processName, IntPtr baseAddress, string s)
+        /// <summary>
+        /// Searches the memory of the remote process for the specified pattern
+        /// </summary>
+        public IEnumerable<IntPtr> PatternScan(IntPtr baseAddress, string pattern)
         {
-            using (var methodWrapper = new MethodWrapper(processName))
+            // Ensure the arguments passed in are valid
+
+            if (string.IsNullOrWhiteSpace(pattern))
             {
-                return methodWrapper.WriteMemory(baseAddress, s);
+                throw new ArgumentException("One or more of the arguments provided were invalid");
             }
+
+            var patternBytes = pattern.Split().ToList();
+            
+            // Ensure the pattern is valid
+
+            if (patternBytes.Any(patternByte => patternByte != "??" && !int.TryParse(patternByte, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out _)))
+            {
+                throw new ArgumentException("The pattern contained one or more invalid characters");
+            }
+            
+            // Remove any unnecessary wildcards
+
+            patternBytes = patternBytes.SkipWhile(patternByte => patternByte == "??")
+                                       .Reverse()
+                                       .SkipWhile(patternByte => patternByte == "??")
+                                       .Reverse().ToList();
+
+            return _patternScanner.FindPattern(baseAddress, patternBytes);
         }
         
-        public bool WriteMemory(int processId, IntPtr baseAddress, string s)
+        /// <summary>
+        /// Searches the memory of the remote process for the specified pattern
+        /// </summary>
+        public IEnumerable<IntPtr> PatternScan(string pattern)
         {
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.WriteMemory(baseAddress, s);
-            }
+            return PatternScan(IntPtr.Zero, pattern);
+        }
+
+        /// <summary>
+        /// Changes the protection of a region of virtual memory in the remote process
+        /// </summary>
+        public MemoryProtection ProtectVirtualMemory(IntPtr baseAddress, int protectionSize, MemoryProtection protectionType)
+        {
+            return _memoryManager.ProtectVirtualMemory(baseAddress, protectionSize, protectionType);
         }
         
-        public bool WriteMemory<TStructure>(string processName, IntPtr baseAddress, TStructure structure) where TStructure : struct
+        /// <summary>
+        /// Reads an array of bytes from a region of virtual memory in the remote process
+        /// </summary>
+        public byte[] ReadVirtualMemory(IntPtr baseAddress, int bytesToRead)
         {
-            using (var methodWrapper = new MethodWrapper(processName))
-            {
-                return methodWrapper.WriteMemory(baseAddress, structure);
-            }
+            return _memoryManager.ReadVirtualMemory(baseAddress, bytesToRead);
         }
         
-        public bool WriteMemory<TStructure>(int processId, IntPtr baseAddress, TStructure structure) where TStructure : struct
+        /// <summary>
+        /// Reads a structure from a region of virtual memory in the remote process
+        /// </summary>
+        public TStructure ReadVirtualMemory<TStructure>(IntPtr baseAddress) where TStructure : struct
         {
-            using (var methodWrapper = new MethodWrapper(processId))
-            {
-                return methodWrapper.WriteMemory(baseAddress, structure);
-            }
+            return _memoryManager.ReadVirtualMemory<TStructure>(baseAddress);
         }
         
-        #endregion
+        /// <summary>
+        /// Writes an array of bytes into a region of virtual memory in the remote process
+        /// </summary>
+        public void WriteVirtualMemory(IntPtr baseAddress, byte[] bytesToWrite)
+        {
+            _memoryManager.WriteVirtualMemory(baseAddress, bytesToWrite);
+        }
+        
+        /// <summary>
+        /// Writes a structure into a region of virtual memory in the remote process
+        /// </summary>
+        public void WriteVirtualMemory<TStructure>(IntPtr baseAddress, TStructure structureToWrite) where TStructure : struct
+        {
+            _memoryManager.WriteVirtualMemory(baseAddress, structureToWrite);
+        }
     }
 }

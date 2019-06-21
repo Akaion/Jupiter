@@ -2,21 +2,22 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/jp6fnwbq34w012gj?svg=true)](https://ci.appveyor.com/project/Akaion/jupiter)
 
-A Windows external memory editing library written in C# that supports several memory editing methods.
+A Windows virtual memory editing library with support for pattern scanning.
 
 ----
 
-### Supported Methods
+### Features
 
-* Allocate Memory
-* Free Memory
-* Protect Memory
-* Read Memory
-* Write Memory
+* Allocate memory
+* Free memory
+* Protect memory
+* Read memory
+* Write memory
 
-### Extensions
+### Pattern Scanning Features
 
-* Pattern Scanning with support for wildcard bytes
+* Support for wildcard bytes
+* A Bower-Moore-Horspool algorithm implementation for fast scanning, particularly for large patterns
 
 ----
 
@@ -26,105 +27,78 @@ A Windows external memory editing library written in C# that supports several me
 
 ----
 
-### Useage
+### Usage
 
-Any method can be overloaded with a process id instead of a process name
-
-#### Allocate Memory
+The example below describes a basic implementation of the library
 
 ```csharp
 using Jupiter;
 
-var memoryModule = new MemoryModule();
+var memoryModule = new MemoryModule(processName);
 
-// Allocate memory in a remote process
+// Allocate a region of virtual memory in the process
 
-var allocatedMemoryAddress = memoryModule.AllocateMemory("processName", size);
+var regionAddress = memoryModule.AllocateVirtualMemory(sizeof(int), MemoryProtection.ReadWrite);
+
+// Write a value into the newely allocated region
+
+memoryModule.WriteVirtualMemory(regionAddress, 25);
+
+// Scan for the value we just wrote into memory
+
+var patternAddresses = memoryModule.PatternScan(BitConverter.GetBytes(25));
+
+// Read the value back
+
+var value = memoryModule.ReadVirtualMemory<int>(regionAddress);
+
+// Free the region of virtual memory
+
+memoryModule.FreeVirtualMemory(regionAddress);
 ```
 
-#### Free Memory
+----
+
+### Overloads
+
+The first of these allows you to specify an address in which you want to allocate a region of virtual memory.
 
 ```csharp
-using Jupiter;
-
-var memoryModule = new MemoryModule();
-
-// Free memory in a remote process at an address
-
-memoryModule.FreeMemory("processName", address);
+var regionAddress = memoryModule.AllocateVirtualMemory(pointer, sizeof(int), MemoryProtection.ReadWrite);
 ```
 
-#### Protect Memory
+The second of these allows you to read an array of bytes instead of a structure.
 
 ```csharp
-using Jupiter;
-
-var memoryModule = new MemoryModule();
-
-// Protect memory in a remote process at an address
-
-memoryModule.ProtectMemory("processName", address, size, protectionConstant);
+var bytes = memoryModule.ReadVirtualMemory(regionAddress, bytesToRead);
 ```
 
-#### Read Memory
+The third of these allows you to write an array of bytes instead of a structure.
 
 ```csharp
-using Jupiter;
-
-var memoryModule = new MemoryModule();
-
-// Read a byte array from a remote process at an address
-
-var memoryBytes = memoryModule.ReadMemory("processName", address, size);
-
-// Read a structure from a remote process at an address
-
-var memoryBoolean = memoryModule.ReadMemory<bool>("processName", address);
-
-// Read a string from a remote process at an address
-
-var memoryStringBytes = memoryModule.ReadMemory("processName", address, sizeOfString);
-
-var memoryString = Encoding.Default.GetString(memoryStringBytes);
+memoryModule.WriteVirtualMemory(regionAddress, new byte[] {0x19, 0xF0, 0x00, 0x2A});
 ```
 
-#### Write Memory
+The fourth of these allows you to use a string with wildcards as the pattern for pattern scanning.
 
 ```csharp
-using Jupiter;
-
-var memoryModule = new MemoryModule();
-
-// Write a byte array, structure or string into a remote process at an address
-
-memoryModule.WriteMemory("processName", address, object);
+memoryModule.PatternScan("19 F0 ?? 2A");
 ```
 
-#### Pattern Scan
+The fifth of these allows you to specify a base address in which the pattern scanning should start at to allow quicker scans.
 
 ```csharp
-using Jupiter;
-
-var memoryModule = new MemoryModule();
-
-// Find the addresses where a pattern appears in a remote process
-
-var patternAddresses = memoryModule.PatternScan("processName", IntPtr.Zero, "45 FF ?? 01 ?? ?? 2A");
+memoryModule.PatternScan(pointer, BitConverter.GetBytes(25));
 ```
 
-You also have the option to overload the pattern with a byte array representing the pattern if wildcard bytes are not needed
+----
 
-```csharp
-using Jupiter;
+### Caveats
 
-var memoryModule = new MemoryModule();
+* If no memory protection constant is specified when allocating virtual memory, ExecuteReadWrite will be used.
 
-// Find the addresses where a pattern appears in a remote process
+* Pattern scanning with a small pattern may take a long time depending on your CPU.
 
-var pattern = new byte[] {0x45, 0xFF, 0x00, 0x01, 0x24, 0xAA, 0x2A};
-
-var patternAddresses = memoryModule.PatternScan("processName", IntPtr.Zero, pattern);
-```
 ----
 
 ### Contributing

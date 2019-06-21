@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jupiter", "Jupiter\Jupiter.csproj", "{2DE000D8-B8E9-4A3C-A790-38A7258262BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jupiter", "Jupiter\Jupiter.csproj", "{CED4469F-E5F5-420D-BF91-057CD6A70D67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jupiter.Tests", "Jupiter.Tests\Jupiter.Tests.csproj", "{2F950B1B-0173-4DF8-927E-CFBE4B429657}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jupiter.Tests", "Jupiter.Tests\Jupiter.Tests.csproj", "{36821454-FB69-4B7D-8441-102DE66377A7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,13 +10,13 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2DE000D8-B8E9-4A3C-A790-38A7258262BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2DE000D8-B8E9-4A3C-A790-38A7258262BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2DE000D8-B8E9-4A3C-A790-38A7258262BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2DE000D8-B8E9-4A3C-A790-38A7258262BB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2F950B1B-0173-4DF8-927E-CFBE4B429657}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2F950B1B-0173-4DF8-927E-CFBE4B429657}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2F950B1B-0173-4DF8-927E-CFBE4B429657}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2F950B1B-0173-4DF8-927E-CFBE4B429657}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CED4469F-E5F5-420D-BF91-057CD6A70D67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CED4469F-E5F5-420D-BF91-057CD6A70D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CED4469F-E5F5-420D-BF91-057CD6A70D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CED4469F-E5F5-420D-BF91-057CD6A70D67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36821454-FB69-4B7D-8441-102DE66377A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36821454-FB69-4B7D-8441-102DE66377A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36821454-FB69-4B7D-8441-102DE66377A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36821454-FB69-4B7D-8441-102DE66377A7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

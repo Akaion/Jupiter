@@ -2,12 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <PackageVersion>1.6.0</PackageVersion>
+        <Title>Jupiter</Title>
         <Authors>Akaion</Authors>
-        <PackageVersion>1.5.1</PackageVersion>
-        <Description>A Windows memory editing library written in C# that supports several memory editing methods.</Description>
+        <Description>A Windows virtual memory editing library with support for pattern scanning.</Description>
         <RepositoryUrl>https://github.com/Akaion/Jupiter</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DocumentationFile>bin\Release\Jupiter.xml</DocumentationFile>
     </PropertyGroup>
 
 </Project>
