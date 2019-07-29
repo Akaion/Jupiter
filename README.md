@@ -36,8 +36,6 @@ using Jupiter;
 
 using (var memoryModule = new MemoryModule(processName))
 {
-    var memoryModule = new MemoryModule(processName);
-
     // Allocate a region of virtual memory in the process
 
     var regionAddress = memoryModule.AllocateVirtualMemory(sizeof(int), MemoryProtection.ReadWrite);
