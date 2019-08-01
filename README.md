@@ -63,36 +63,37 @@ using (var memoryModule = new MemoryModule(processName))
 
 ### Overloads
 
-The first of these allows you to use a process ID instead of a process name.
+You can use a process ID instead of a process name.
 
 ```csharp
 var memoryModule = new MemoryModule(processId)
 ```
-The second of these allows you to specify an address in which you want to allocate a region of virtual memory.
+
+You can specify an address in which you want to allocate a region of virtual memory.
 
 ```csharp
 var regionAddress = memoryModule.AllocateVirtualMemory(pointer, sizeof(int), MemoryProtection.ReadWrite);
 ```
 
-The third of these allows you to read an array of bytes instead of a structure.
+You can read an array of bytes instead of a structure.
 
 ```csharp
 var bytes = memoryModule.ReadVirtualMemory(regionAddress, bytesToRead);
 ```
 
-The fourth of these allows you to write an array of bytes instead of a structure.
+You can write an array of bytes instead of a structure.
 
 ```csharp
 memoryModule.WriteVirtualMemory(regionAddress, new byte[] {0x19, 0xF0, 0x00, 0x2A});
 ```
 
-The fifth of these allows you to use a string with wildcards as the pattern for pattern scanning.
+You can use a string with wildcards as the pattern for pattern scanning.
 
 ```csharp
 memoryModule.PatternScan("19 F0 ?? 2A");
 ```
 
-The sixth of these allows you to specify a base address in which the pattern scanning should start at to allow quicker scans.
+You can specify a base address in which the pattern scanning should start at to allow quicker scans.
 
 ```csharp
 memoryModule.PatternScan(pointer, BitConverter.GetBytes(25));
@@ -104,7 +105,7 @@ memoryModule.PatternScan(pointer, BitConverter.GetBytes(25));
 
 * If no memory protection constant is specified when allocating virtual memory, ExecuteReadWrite will be used.
 
-* Pattern scanning with a small pattern may take a long time depending on your CPU.
+* Pattern scanning with a small pattern may take a long time depending on the speed of your CPU.
 
 ----
 
@@ -112,4 +113,4 @@ memoryModule.PatternScan(pointer, BitConverter.GetBytes(25));
 
 Pull requests are welcome. 
 
-For large changes, please open an issue first to discuss what you would like to add.
+For large changes, please open an issue first to discuss what you would like to contribute.
